@@ -300,7 +300,7 @@ if ($Env:flavor -ne "DevOps") {
             Start-Sleep(60)
     
             # Get access token to make ARM REST API call for SQL server BPA
-            $armRestApiEndpoint = "https://management.azure.com/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
+            $armRestApiEndpoint = "https://management.usgovcloudapi.net/subscriptions/$subscriptionId/resourcegroups/$resourceGroup/providers/Microsoft.HybridCompute/machines/$SQLvmName/extensions/WindowsAgent.SqlServer?api-version=2019-08-02-preview"
             $token = (az account get-access-token --subscription $subscriptionId --query accessToken --output tsv)
             $headers = @{"Authorization" = "Bearer $token"; "Content-Type" = "application/json" }
     
