@@ -134,6 +134,7 @@ if ($Env:flavor -ne "DevOps") {
     az provider register --namespace Microsoft.GuestConfiguration --wait --only-show-errors
     #az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
 
+    <#
     # Enable defender for cloud for SQL Server
     # Verify existing plan and update accordingly
     $currentsqlplan = (az security pricing show -n SqlServerVirtualMachines --subscription $subscriptionId | ConvertFrom-Json)
@@ -169,16 +170,18 @@ if ($Env:flavor -ne "DevOps") {
 
     # Verify if VHD files already downloaded especially when re-running this script
     if (!([System.IO.File]::Exists($SQLvmvhdPath) )) {
-        <# Action when all if and elseif conditions are false #>
+        # Action when all if and elseif conditions are false
         $Env:AZCOPY_BUFFER_GB = 4
         # Other ArcBox flavors does not have an azcopy network throughput capping
         Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
         azcopy cp $vhdSourceFolder/$sas --include-pattern "${SQLvmName}.vhdx" $Env:ArcBoxVMDir --check-length=false --cap-mbps 1200 --log-level=ERROR
     }
+    #>
 
     # Create the nested VMs if not already created
     Write-Header "Create Hyper-V VMs"
 
+    <#
     # Create the nested SQL VM
     Write-Host "Create SQL VM"
     if ((Get-VM -Name $SQLvmName -ErrorAction SilentlyContinue).State -ne "Running") {
@@ -198,7 +201,6 @@ if ($Env:flavor -ne "DevOps") {
     # Start all the VMs
     Write-Host "Starting SQL VM"
     Start-VM -Name $SQLvmName
-
 
     # Restarting Windows VM Network Adapters
     Write-Host "Restarting Network Adapters"
@@ -222,7 +224,6 @@ if ($Env:flavor -ne "DevOps") {
         # Allow SSH via Azure Arc agent
         azcmagent config set incomingconnections.ports 22
     } -Credential $winCreds
-
 
     # Install Log Analytics extension to support Defender for SQL
     $mmaExtension = az connectedmachine extension list --machine-name $SQLvmName --resource-group $resourceGroup --query "[?name=='MicrosoftMonitoringAgent']" | ConvertFrom-Json
@@ -281,14 +282,13 @@ if ($Env:flavor -ne "DevOps") {
             Exit
         }
 
-
         # Verify if ArcBox SQL resource is created
         $arcSQLStatus = az resource list --resource-group $resourceGroup --query "[?type=='Microsoft.AzureArcData/SqlServerInstances'].[provisioningState]" -o tsv
         if ($arcSQLStatus -ne "Succeeded"){
             Write-Host "WARNING: ArcBox-SQL Arc-enabled server resource not found. Wait for the resource to be created and follow troubleshooting guide to run assessment manually."
         }
         else {
-            <# Action when all if and elseif conditions are false #>
+            # Action when all if and elseif conditions are false
             Write-Host "Enabling SQL server best practices assessment"
             $bpaDeploymentTemplateUrl = "$Env:templateBaseUrl/artifacts/sqlbpa.json"
             az deployment group create --resource-group $resourceGroup --template-uri $bpaDeploymentTemplateUrl --parameters workspaceName=$Env:workspaceName vmName=$SQLvmName arcSubscriptionId=$subscriptionId
@@ -317,7 +317,7 @@ if ($Env:flavor -ne "DevOps") {
                 Write-Host "Arc-enabled SQL server best practices assessment executed. Wait for assessment to complete to view results."
             }
             else {
-                <# Action when all if and elseif conditions are false #>
+                # Action when all if and elseif conditions are false
                 Write-Host "SQL Best Practices Assessment faild. Please refer troubleshooting guide to run manually."
             }
         }
@@ -328,6 +328,7 @@ if ($Env:flavor -ne "DevOps") {
     $remoteScriptFileFile = "$agentScript\testDefenderForSQL.ps1"
     Copy-VMFile $SQLvmName -SourcePath "$Env:ArcBoxDir\testDefenderForSQL.ps1" -DestinationPath $remoteScriptFileFile -CreateFullPath -FileSource Host -Force
     Invoke-Command -VMName $SQLvmName -ScriptBlock { powershell -File $Using:remoteScriptFileFile } -Credential $winCreds
+    #>
 
     if (($Env:flavor -eq "Full") -or ($Env:flavor -eq "ITPro")) {
         Write-Header "Fetching Nested VMs"
@@ -346,7 +347,7 @@ if ($Env:flavor -ne "DevOps") {
 
         # Verify if VHD files already downloaded especially when re-running this script
         if (!([System.IO.File]::Exists($win2k19vmvhdPath) -and [System.IO.File]::Exists($Win2k22vmvhdPath) -and [System.IO.File]::Exists($Ubuntu01vmvhdPath) -and [System.IO.File]::Exists($Ubuntu02vmvhdPath))) {
-            <# Action when all if and elseif conditions are false #>
+            # Action when all if and elseif conditions are false
             $Env:AZCOPY_BUFFER_GB = 4
             if ($Env:flavor -eq "Full") {
                 # The "Full" ArcBox flavor has an azcopy network throughput capping
