@@ -124,6 +124,7 @@ if ($Env:flavor -ne "DevOps") {
 
     # Required for CLI commands
     Write-Header "Az CLI Login"
+    az cloud set --name 'AzureUSGovernment'
     az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
 
     # Register Azure providers
