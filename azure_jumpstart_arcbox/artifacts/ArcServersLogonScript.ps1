@@ -131,7 +131,7 @@ if ($Env:flavor -ne "DevOps") {
     az provider register --namespace Microsoft.HybridCompute --wait --only-show-errors
     az provider register --namespace Microsoft.HybridConnectivity --wait --only-show-errors
     az provider register --namespace Microsoft.GuestConfiguration --wait --only-show-errors
-    az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
+    #az provider register --namespace Microsoft.AzureArcData --wait --only-show-errors
 
     # Enable defender for cloud for SQL Server
     # Verify existing plan and update accordingly
