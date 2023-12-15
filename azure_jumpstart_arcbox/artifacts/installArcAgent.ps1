@@ -26,7 +26,7 @@
  --tenant-id $spnTenantId `
  --location $Azurelocation `
  --subscription-id $subscriptionId `
- --cloud "AzureCloud" `
+ --cloud "AzureUSGovernment" `
  --tags "Project=jumpstart_arcbox" `
  --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a" # Do no change!
  
